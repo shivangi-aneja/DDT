@@ -162,12 +162,12 @@ The dataset provides videos for 4 different manipulation methods, namely DeepFak
 
 ##### 4.8 Fine-tuning (DF + NT) to Dessa dataset
 <p float="left">
-<img src="/figures/results/few_shot/dessa_with_spatial_aug.png" width="100%" />
+<img src="/figures/results/other_datasets/dessa_with_spatial_aug.png" width="100%" />
 </p>
 
 ##### 4.9 Fine-tuning (DF + NT) to AIF dataset
 <p float="left">
-<img src="/figures/results/few_shot/aif_with_spatial_aug.png" width="100%" />
+<img src="/figures/results/other_datasets/aif_with_spatial_aug.png" width="100%" />
 </p>
 
 
