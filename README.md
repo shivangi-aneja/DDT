@@ -10,13 +10,26 @@ For setting up environment, please read `SETUP.md`
 ### FaceForensics ++ Dataset
 The dataset provides videos for 4 different manipulation methods, namely DeepFakes, Face2Face, FaceSwap, and NeuralTextures and their real counterparts.
 <p float="left">
-<img src="/figures/dataset/faceforensics.png" width="100%" />
+<figure>
+    <img src='/figures/dataset/faceforensics.png' width="100%"  alt='FaceForensics++' />
+    <figcaption><a href="https://arxiv.org/pdf/1901.08971.pdf">Image Source</a></figcaption>
+</figure>
 </p>
 
 ### Google DFDC Dataset
 <p float="left">
-<img src="/figures/dataset/dfdc_1.png" width="50%" />
-<img src="/figures/dataset/dfdc_2.png" width="100%" />
+<figure>
+    <img src='/figures/dataset/dfdc.png' width="100%"  alt='Google DFDC' />
+    <a href="https://ai.googleblog.com/2019/09/contributing-data-to-deepfake-detection.html">Image Source</a>
+</figure>
+</p>
+
+### Dessa Dataset
+<p float="left">
+<figure>
+    <img src='/figures/dataset/dessa.png' width="100%"  alt='Google DFDC' />
+    <a href="https://www.dessa.com/post/deepfake-detection-that-actually-works">Image Source</a>
+</figure>
 </p>
 
 ## 1. Forged Video Detection in Zero and Few Shot Setup
