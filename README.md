@@ -1,108 +1,132 @@
-# Master Thesis : Generalized Zero and Few Shot Transfer for Facial Forgery Detection
+# Generalized Zero and Few Shot Transfer for Facial Forgery Detection
 
 ## 0. Links
 [Research Log](https://docs.google.com/document/d/16Equq5mI2USyMEJvcCYkBg37eLqGu-ICjZgOuCcptf0/edit)
 
 For setting up environment, please read `SETUP.md`
 
-## 1. Datasets Used
 
-### FaceForensics ++ Dataset
+## 1. Training and Testing (Zero-Shot)
+
+To train Classifier, run the file `train_classifier.py`
+
+To test ForensicTransfer, run the file `train_forensic_transfer.py` 
+
+To test Our approach, run the file `train_vae_2classes.py`
+
+How to run `train_classifier.py` / `train_forensic_transfer.py` / `train_vae_2classes.py`
+```
+usage: train_vae_2classes.py [-h] [-seed RANDOM_SEED]  [-div-loss DIVERGENCE_LOSS]
+               [--batch-size BATCH_SIZE] [--latent-dim LATENT_DIM] [-dataset_mode DATASET_MODE]
+                [-epochs EPOCHS]  [-num-classes NUM_CLASSES]          
+
+optional arguments:
+  -h, --help                     show this help message and exit
+  
+  --seed RANDOM_SEED,            random seed for training (default: 1)
+  
+  --div-loss DIVERGENCE_LOSS,    divergence loss function (only for train_vae_2classes.py) , {'KL', 'Wasserstein'}
+                        
+  --batch-size BATCH_SIZE,       input batch size for training (default: 128)
+                        
+  --epochs EPOCHS,               number of epochs (default: 10000) 
+  
+  --latent-dim LATENT_DIM,       embedding size (default: 16) 
+  
+  --dataset_mode DATASET_MODE,   dataset mode for training (default: 'face') {'face', 'face_finetune', 'face_residual', 'lip'}
+                        
+  --num-classes NUM_CLASSES,     number of classes to train with (default: 2)
+```
+
+#### Sample Command
+```
+python3 train_vae_2classes.py --batch-size 128  --latent-dim 16
+```
+
+## 2. Fine-tuning (Few-Shot Learning)
+
+To train Classifier, run the file `train_classifier.py`
+
+To test ForensicTransfer, run the file `train_forensic_transfer.py` 
+
+To test Our approach, run the file `train_vae_2classes.py`
+
+How to run `train_classifier.py` / `train_forensic_transfer.py` / `train_vae_2classes.py`
+```
+usage: train_vae_2classes.py [-h] [-seed RANDOM_SEED]  [-div-loss DIVERGENCE_LOSS]
+               [--batch-size BATCH_SIZE] [--latent-dim LATENT_DIM] [-dataset_mode DATASET_MODE]
+                [-epochs EPOCHS]  [-num-classes NUM_CLASSES]          
+
+optional arguments:
+  -h, --help                     show this help message and exit
+  
+  --seed RANDOM_SEED,            random seed for training (default: 1)
+  
+  --div-loss DIVERGENCE_LOSS,    divergence loss function (only for train_vae_2classes.py) , {'KL', 'Wasserstein'}
+                        
+  --batch-size BATCH_SIZE,       input batch size for training (default: 128)
+                        
+  --epochs EPOCHS,               number of epochs (default: 10000) 
+  
+  --latent-dim LATENT_DIM,       embedding size (default: 16) 
+  
+  --dataset_mode DATASET_MODE,   dataset mode for training (default: 'face') {'face', 'face_finetune', 'face_residual', 'lip'}
+                        
+  --num-classes NUM_CLASSES,     number of classes to train with (default: 2)
+```
+
+
+
+## 3. Datasets Used
+
+### [FaceForensics ++ Dataset](https://arxiv.org/pdf/1901.08971.pdf)
 The dataset provides videos for 4 different manipulation methods, namely DeepFakes, Face2Face, FaceSwap, and NeuralTextures and their real counterparts.
 <p float="left">
 <figure>
     <img src='/figures/dataset/faceforensics.png' width="100%"  alt='FaceForensics++' />
-    <figcaption><a href="https://arxiv.org/pdf/1901.08971.pdf">Image Source</a></figcaption>
+    <figcaption><a href="">Image Source</a></figcaption>
 </figure>
 </p>
 
-### Google DFDC Dataset
+### [Google DFDC Dataset](https://ai.googleblog.com/2019/09/contributing-data-to-deepfake-detection.html)
 <p float="left">
 <figure>
-    <img src='/figures/dataset/dfdc.png' width="100%"  alt='Google DFDC' />
-    <a href="https://ai.googleblog.com/2019/09/contributing-data-to-deepfake-detection.html">Image Source</a>
+    <img src='/figures/dataset/dfdc.jpg' width="100%"  alt='Google DFDC' />
 </figure>
 </p>
 
-### Dessa Dataset
+### [Dessa Dataset](https://www.dessa.com/post/deepfake-detection-that-actually-works)
 <p float="left">
 <figure>
     <img src='/figures/dataset/dessa.png' width="100%"  alt='Google DFDC' />
-    <a href="https://www.dessa.com/post/deepfake-detection-that-actually-works">Image Source</a>
+    <a href="">Image Source</a>
 </figure>
 </p>
 
-## 1. Forged Video Detection in Zero and Few Shot Setup
+### [AIF Dataset](https://aifoundation.com/)
+<p float="left">
+<figure>
+    <img src='/figures/dataset/aif.png' width="100%"  alt='Google DFDC' />
+</figure>
+</p>
 
-For our task, we used FaceForens dataset and ETIS-Larib dataset.
+### Dataset Splitting
+| Dataset  | Train | Val | Test |
+| ------------- | ------------- | ------------- | ------------- |
+| FaceForensics++  | 720  | 140  | 140 |
+| Google DFDC  | - | -  | 28  |
+| Dessa  | - | -  | 28  |
+| AIF  | - | -  | 28  |
 
-
-## 1. Polyp Localization
-
-The task here is to train Fully Convolutional Network (FCN-8s)  to create segmentation masks for the polyps and then draw a bounding box around it.
-To train FCN-8s, run `main.py`.
-To evaluate/test the models, run `predict_masks.py`
-
-
-## 2. Polyp Detection
+## 4. Results
 
 The task here is to train object detection network. We used SSD (Single Shot Multibox detectot to evaluate our results).
 Code is available for both `Faster R-CNN` and `SSD`.
 
-To train faster R-CNN, run the file `keras_train_frcnn.py`
-To test faster R-CNN, run the file `keras_test_frcnn.py`
+
 
 To run SSD, migrate to directory SSD-keras, and follow `README.md` for instructions
 
-#### How to run main.py / predict_masks.py / keras_train_frcnn.py / keras_test_frcnn.py
-```
-usage: main.py [-h] [-d DATASET] [--data-dirpath DATA_DIRPATH]
-               [--n-workers N_WORKERS] [--gpu GPU] [-rs RANDOM_SEED]
-               [-a ARCHITECTURE] [-l LOSS] [-b BATCH_SIZE]
-               [-e EPOCHS]  [-lr LEARNING_RATE] [-opt OPTIM] [-m MODEL_NAME]
-               [-r RESUME] [-tf TF_LOGS] [-wd WEIGHT_DECAY]
-               [-dp DROPOUT]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -d DATASET, --dataset DATASET
-                        dataset, {'polyps'} (default: polyps)
-  --data-dirpath DATA_DIRPATH
-                        directory for storing downloaded data (default: data/)
-  --n-workers N_WORKERS
-                        how many threads to use for I/O (default: 4)
-  --gpu GPU             ID of the GPU to train on (or '' to train on CPU)
-                        (default: 0)
-  -rs RANDOM_SEED, --random-seed RANDOM_SEED
-                        random seed for training (default: 1)
-  -a ARCHITECTURE, --architecture ARCHITECTURE
-                        network architecture name, {'fcn8s1'}
-                        (default: fcn8s1)
-  -l LOSS, --loss LOSS
-                        loss function, {'cse'} (default: cse, mse, dse)
-  -b BATCH_SIZE, --batch-size BATCH_SIZE
-                        input batch size for training (default: 50)
-  -e EPOCHS, --epochs EPOCHS
-                        number of epochs (default: 100)
-  -lr LEARNING_RATE, --learning-rate LEARNING_RATE
-                        initial learning rate (default: 0.0001)
-  -opt OPTIM, --optim OPTIM
-                        optimizer, {'adam', 'sgd', 'adagrad', 'rms_prop'} (default: adam)
-  -m MODEL_NAME, --model_name MODEL_NAME
-                        name of the model (default: 'fcn8s_1')
-  -r RESUME, --resume RESUME
-                        flag to resume training (default: 'y')
-  -tf TF_LOGS, --tf_logs TF_LOGS
-                        path for tensorboaard loggging (default: 'tf_logs')
-  -wd WEIGHT_DECAY, --weight_decay WEIGHT_DECAY
-                        weight decay (default: 0)
-  -dp DROPOUT, --dropout DROPOUT
-                        dropout (default: 0)
-```
-#### Sample Command
-```
-python3 main.py -d polyps -a fcn8s -b 100  -e 20
-```
 
 
 ## 3. Misc
