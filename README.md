@@ -115,42 +115,60 @@ The dataset provides videos for 4 different manipulation methods, namely DeepFak
 
 ## 4. Results
 
-#### Zero-Shot Results
+### Zero-Shot Results
 
-###### Transfer Accuracy for different manipulation methods
+##### 4.1 Transfer Accuracy for different manipulation methods
 <p float="left">
 <img src="/figures/results/zero_shot_acc.png" width="100%" />
 </p>
 
-###### Model trained on DF manipulation and tested on other manipulation methods
+##### 4.2 DF manipulation to other manipulation methods
 <p float="left">
 <img src="/figures/results/zero_shot/df_zero_shot.png" width="100%" />
 </p>
 
-###### Model trained on NT manipulation and tested on other manipulation methods
+##### 4.3 NT manipulation to other manipulation methods
 <p float="left">
 <img src="/figures/results/zero_shot/nt_zero_shot.png" width="100%" />
 </p>
 
-###### Model trained with DF manipulation with and without proposed augmentation strategy and evaluated on NT manipulation method.
+##### 4.4 Model trained with DF manipulation with and without proposed augmentation strategy and evaluated on NT manipulation method.
 <p float="left">
 <img src="/figures/results/aug/df_aug.png" width="100%" />
 </p>
 
-###### Model trained with NT manipulation with and without proposed augmentation strategy and evaluated on DF manipulation method.
+##### 4.5 Model trained with NT manipulation with and without proposed augmentation strategy and evaluated on DF manipulation method.
 <p float="left">
 <img src="/figures/results/aug/nt_aug.png" width="100%" />
 </p>
 
-###### Model trained with DF + NT manipulation with and without proposed augmentation strategy and evaluated on other datasets
+##### Model trained with DF + NT manipulation with and without proposed augmentation strategy and evaluated on other datasets
 <p float="left">
 <img src="/figures/results/other_datasets/other_datasets_spatial_aug.png" width="100%" />
 </p>
 
 
+### Few-Shot Results With Spatial Augmentation
 
+##### 4.6 Fine-tuning NT to DF manipulation 
+<p float="left">
+<img src="/figures/few_shot/nt_to_df_with_aug.png" width="100%" />
+</p>
 
+##### 4.7 Fine-tuning DF to NT manipulation 
+<p float="left">
+<img src="/figures/few_shot/df_to_nt_with_aug.png" width="100%" />
+</p>
 
+##### 4.8 Fine-tuning (DF + NT) to Dessa dataset
+<p float="left">
+<img src="/figures/few_shot/dessa_with_spatial_aug.png" width="100%" />
+</p>
+
+##### 4.9 Fine-tuning (DF + NT) to AIF dataset
+<p float="left">
+<img src="/figures/few_shot/aif_with_spatial_aug.png" width="100%" />
+</p>
 
 
 
