@@ -115,16 +115,37 @@ The dataset provides videos for 4 different manipulation methods, namely DeepFak
 
 ## 4. Results
 
-#### Results on Validation set for Single Shot Multi Box Detector
+#### Zero-Shot Results
 
-##### Zero-Shot Transfer Accuracy for different manipulation methods
+###### Transfer Accuracy for different manipulation methods
 <p float="left">
 <img src="/figures/results/zero_shot_acc.png" width="100%" />
 </p>
 
+###### Model trained on DF manipulation and tested on other manipulation methods
+<p float="left">
+<img src="/figures/results/zero_shot/df_zero_shot.png" width="100%" />
+</p>
 
+###### Model trained on NT manipulation and tested on other manipulation methods
+<p float="left">
+<img src="/figures/results/zero_shot/nt_zero_shot.png" width="100%" />
+</p>
 
+###### Model trained with DF manipulation with and without proposed augmentation strategy and evaluated on NT manipulation method.
+<p float="left">
+<img src="/figures/results/aug/df_aug.png" width="100%" />
+</p>
 
+###### Model trained with NT manipulation with and without proposed augmentation strategy and evaluated on DF manipulation method.
+<p float="left">
+<img src="/figures/results/aug/nt_aug.png" width="100%" />
+</p>
+
+###### Model trained with DF + NT manipulation with and without proposed augmentation strategy and evaluated on other datasets
+<p float="left">
+<img src="/figures/results/other_datasets/other_datasets_spatial_aug.png" width="100%" />
+</p>
 
 
 
