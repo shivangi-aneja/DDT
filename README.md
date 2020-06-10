@@ -1,5 +1,4 @@
-# Generalized Zero and Few Shot Transfer for Facial Forgery Detection
-
+# DDT (Deep Distribution Transfer) : Zero and Few-Shot Transfer for Facial Forgery Detection
 ## 0. Links
 [Research Log](https://docs.google.com/document/d/16Equq5mI2USyMEJvcCYkBg37eLqGu-ICjZgOuCcptf0/edit)
 
