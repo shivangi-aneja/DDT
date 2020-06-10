@@ -2,44 +2,28 @@
 
 <p float="left">
 <figure>
-    <img src='/figures/method/method.jpg' width="100%"  alt='method' />
+    <img src='/figures/method.jpg' width="100%"  alt='method' />
 </figure>
 </p>
 
 ### 0. Setup
 For setting up environment, please read [SETUP.md](SETUP.md)
 
-## 1. Datasets
-Please contact the respective authors to get the 
+### 1. Datasets
+<p float="left">
+<figure>
+    <img src='/figures/datasets.jpg' width="100%"  alt='Datasets' />
+</figure>
+</p>
+Please contact the respective authors to get the datasets. Except (AIF) dataset which is donated by the company [AI Foundation](https://aifoundation.com/) to the authors anc can be downloaded with link below.  
 
-#### [FaceForensics ++ Dataset](https://arxiv.org/pdf/1901.08971.pdf)
+| [FaceForensics ++ ](https://arxiv.org/pdf/1901.08971.pdf)  | [Google DFDC](https://ai.googleblog.com/2019/09/contributing-data-to-deepfake-detection.html) | [Dessa](https://www.dessa.com/post/deepfake-detection-that-actually-works) | [Celeb DF(v2)](https://arxiv.org/abs/1909.12962) | [AIF](https://www.dropbox.com/s/arnx7s13hm129ra/AIF.zip) |
+| ------------- | ------------- | ------------- | ------------- | ------------- |
+#### 
 The dataset provides videos for 4 different manipulation methods, namely DeepFakes, Face2Face, FaceSwap, and NeuralTextures and their real counterparts.
-<p float="left">
-<figure>
-    <img src='/figures/dataset/faceforensics.png' width="100%"  alt='FaceForensics++' />
-</figure>
-</p>
 
-### [Google DFDC Dataset](https://ai.googleblog.com/2019/09/contributing-data-to-deepfake-detection.html)
-<p float="left">
-<figure>
-    <img src='/figures/dataset/dfdc.jpg' width="70%"  alt='Google DFDC' />
-</figure>
-</p>
 
-### [Dessa Dataset](https://www.dessa.com/post/deepfake-detection-that-actually-works)
-<p float="left">
-<figure>
-    <img src='/figures/dataset/dessa.png' width="70%"  alt='Google DFDC' />
-</figure>
-</p>
 
-### [AIF Dataset](https://aifoundation.com/)
-<p float="left">
-<figure>
-    <img src='/figures/dataset/aif_images.png' width="100%"  alt='Google DFDC' />
-</figure>
-</p>
 
 ### Dataset Splitting
 | Dataset  | Train | Val | Test |
