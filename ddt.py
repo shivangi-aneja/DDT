@@ -33,7 +33,7 @@ kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 train_mode = args.train_mode
 
 # Models
-model_name = 'ddt_train_20k_val3k_mean1_std1_c23_latent' + str(latent_dim) + '_3blocks_2classes_flip_normalize_nt'
+model_name = 'ddt_train_20k_val3k_mean1_std1_c23_latent' + str(latent_dim) + '_3blocks_2classes_flip_normalize_df_nt'
 logger = Logger(model_name='ddt_model', data_name='ff',
                 log_path=os.path.join(os.getcwd(), 'tf_logs/ddt/2classes/' + model_name))
 model_name = model_name + '.pt'

@@ -43,10 +43,10 @@ div_loss = DIV_LOSSES[divergence]
 classification_loss = nn.CrossEntropyLoss(reduction='mean', weight=class_weights)
 
 train_path = '/home/shivangi/Desktop/Projects/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
+train_path_ff = '/home/shivangi/Desktop/Projects/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
 val_path = '/home/shivangi/Desktop/Projects/master_thesis/data/ff_face_20k/c23/val_6k_c23/'
-train_path_ff = ''
 
-MODEL_PATH = os.path.join(os.getcwd(), 'models/')
+MODEL_PATH = os.path.join(os.getcwd(), 'pretrained_models/')
 
 
 train_dataset = make_dataset(name='ff', base_path=train_path, num_classes=num_classes,
