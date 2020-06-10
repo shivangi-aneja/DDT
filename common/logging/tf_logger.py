@@ -22,8 +22,8 @@ class Logger:
         self.data_subdir = '{}/{}'.format(model_name, data_name)
 
         # TensorBoard
-        self.train_writer = SummaryWriter(logdir=log_path+'/train/', comment=self.comment)
-        self.val_writer = SummaryWriter(logdir=log_path+'/val/', comment=self.comment)
+        self.train_writer = SummaryWriter(log_dir=log_path+'/train/', comment=self.comment)
+        self.val_writer = SummaryWriter(log_dir=log_path+'/val/', comment=self.comment)
 
     def log(self, mode, error, epoch, n_batch, num_batches, scalar='error'):
         """

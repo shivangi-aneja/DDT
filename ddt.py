@@ -7,6 +7,7 @@ from torch import optim
 from common.logging.tf_logger import Logger
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from tqdm import tqdm
+from torch.utils.data import DataLoader
 from config import *
 from common.utils.ddt_utils import ddt_loss
 from common.models.resnet_subset_models import DDTEncoder1 as Encoder
@@ -32,12 +33,16 @@ device = torch.device("cuda" if args.cuda else "cpu")
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 train_mode = args.train_mode
 
+# Dataloaders
+train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, num_workers=8, shuffle=True)
+test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
+
 # Models
-model_name = 'ddt_train_20k_val3k_mean1_std1_c23_latent' + str(latent_dim) + '_3blocks_2classes_flip_normalize_df_nt'
+model_name = 'ddt_train_20k_val3k_mean1_std1_c23_latent' + str(latent_dim) + '_3blocks_2classes_mixup_flip_normalize_df_nt'
 logger = Logger(model_name='ddt_model', data_name='ff',
                 log_path=os.path.join(os.getcwd(), 'tf_logs/ddt/2classes/' + model_name))
 model_name = model_name + '.pt'
-best_path = MODEL_PATH + 'ddt/' + dataset_mode + '/2classes/best/'
+best_path = MODEL_PATH + 'ddt/face/2classes/best/'
 if not os.path.isdir(best_path):
     makedirs(best_path)
 

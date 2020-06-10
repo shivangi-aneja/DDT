@@ -42,10 +42,10 @@ def make_dataset(name, num_classes, base_path=None, base_path_ff=None, transform
     if not name in DATASETS:
         raise ValueError("invalid dataset: '{0}'".format(name))
     elif mode == 'face':
-        return FaceDataset(image_count=image_count, base_path=base_path, transform=transform,
+        return FaceDataset(image_count=image_count, base_path=base_path, spatial_aug=spatial_aug, transform=transform,
                            num_classes=num_classes)
     elif mode == 'face_finetune':
-        return FaceFinetuneDataset(image_count=image_count, base_path=base_path, base_path_ff=base_path_ff,
+        return FaceFinetuneDataset(image_count=image_count, base_path=base_path, spatial_aug=spatial_aug, base_path_ff=base_path_ff,
                                    transform=transform, num_classes=num_classes)
 
 

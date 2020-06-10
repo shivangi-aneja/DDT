@@ -6,6 +6,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch import optim
 from os import makedirs
 from config import *
+from torch.utils.data import DataLoader
 from common.logging.tf_logger import Logger
 from tqdm import tqdm
 from common.models.resnet_subset_models import EncoderLatent as Encoder1
@@ -30,12 +31,16 @@ device = torch.device("cuda" if args.cuda else "cpu")
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 train_mode = args.train_mode
 
+# Dataloaders
+train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, num_workers=8, shuffle=True)
+test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
+
 # Models
 model = 'classifier_train_20k_val3k_mean1_std1_c23_latent16_3blocks_2classes_flip_normalize_nt'
 logger = Logger(model_name='classifier_model', data_name='ff', log_path=os.path.join(os.getcwd(), 'tf_logs/classifier/2classes/'+model))
 model_name = model + '.pt'
 MODEL_PATH = os.path.join(os.getcwd(), 'models/')
-best_path = MODEL_PATH + 'classifier/' + dataset_mode + '/2classes/best/'
+best_path = MODEL_PATH + 'classifier/face/2classes/best/'
 if not os.path.isdir(best_path):
     makedirs(best_path)
 

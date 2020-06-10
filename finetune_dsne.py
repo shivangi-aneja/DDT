@@ -1,105 +1,47 @@
 from __future__ import print_function
 import argparse
-import torch
-import os
 import torch.utils.data
 import numpy as np
-from common.utils.dataset import make_dataset
 from torch.utils.data import DataLoader
-from torch import nn, optim
+from torch import optim
 from os import makedirs
-from torchvision import transforms
 from common.logging.tf_logger import Logger
 import tqdm
+from config import *
 from common.losses.custom_losses import d_sne_loss
 from common.models.resnet_subset_models import EncoderLatent as Encoder1
 import random
 
-parser = argparse.ArgumentParser(description='VAE FaceForensics++ D-SNE FineTuning')
+parser = argparse.ArgumentParser(description='D-SNE FineTuning')
 
-parser.add_argument('--batch-size', type=int, default=128, metavar='N',
-                    help='input batch size for training (default: 128)')
-
-parser.add_argument('-i', '--ft_images', type=int, default=10, metavar='N',
-                    help='number of images for fine_tuning (default: 10)')
-
-parser.add_argument('--epochs', type=int, default=10000, metavar='N',
-                    help='number of epochs to train (default: 10)')
-
+parser.add_argument('--train_mode', type=str, default='train', metavar='N',
+                    help='training mode (train, test)')
+parser.add_argument('--epochs', type=int, default=500, metavar='N',
+                    help='number of epochs to train (default: 500)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='enables CUDA training')
-
-parser.add_argument('--seed', type=int, default=1, metavar='S',
-                    help='random seed (default: 1)')
-
 parser.add_argument('-m', '--model_name', type=str,
                     default='NONE', help='name for model')
-
 parser.add_argument('-r', '--run', type=str,
                     default='1', help='run number')
+parser.add_argument('--log-interval', type=int, default=10, metavar='N',
+                    help='how many batches to wait before logging training status')
 
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
 random.seed(int(args.run))
 torch.manual_seed(int(args.run))
 device = torch.device("cuda" if args.cuda else "cpu")
-
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
-patience = 30
-ft_images_train = args.ft_images
-alpha = 0.25
-
-train_path = '/home/shivangi/Desktop/Projects/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
-val_path = '/home/shivangi/Desktop/Projects/master_thesis/data/ff_face_20k/c23/val_6k_c23/'
-
-src_fake_classes = ['df', 'nt']
-target_fake_classes = ['dfdc']
-tsne_fake_classes = ['dfdc']
-
-
-source_train_dataset = make_dataset(name='ff', base_path=train_path, num_classes=len(src_fake_classes)+1, fake_classes=src_fake_classes,
-                             mode='face', image_count='all',
-                             transform=transforms.Compose([transforms.ToPILImage(),
-                                                           transforms.RandomHorizontalFlip(),
-                                                           transforms.RandomVerticalFlip(),
-                                                           transforms.ToTensor(),
-                                                           transforms.Normalize([0.5] * 3, [0.5] * 3)
-                                                           ]))
-
-target_train_dataset = make_dataset(name='ff', base_path=train_path, num_classes=len(target_fake_classes)+1, fake_classes=target_fake_classes,
-                                    mode='face_finetune', image_count=ft_images_train,
-                                   transform=transforms.Compose([transforms.ToPILImage(),
-                                                                 transforms.RandomHorizontalFlip(),
-                                                                 transforms.RandomVerticalFlip(),
-                                                                 transforms.ToTensor(),
-                                                                 transforms.Normalize([0.5] * 3, [0.5] * 3)]))
-
-
-target_test_dataset = make_dataset(name='ff', base_path=val_path, num_classes=len(target_fake_classes)+1, fake_classes=target_fake_classes,
-                                    mode='face_finetune', image_count='all',
-                                   transform=transforms.Compose(
-                                       [transforms.ToPILImage(),
-                                        transforms.ToTensor(),
-                                        transforms.Normalize([0.5] * 3, [0.5] * 3)]))
-
-tsne_target_test_dataset = make_dataset(name='ff', base_path=val_path, num_classes=len(tsne_fake_classes) + 1, fake_classes=tsne_fake_classes,
-                                        mode='face_finetune', image_count='all',
-                                        transform=transforms.Compose(
-                                            [transforms.ToPILImage(),
-                                             transforms.ToTensor(),
-                                             transforms.Normalize([0.5] * 3, [0.5] * 3)]))
-
-batch_size_train = min(2*ft_images_train, 128)
-batch_size_test = 128
+train_mode = args.train_mode
 
 
 source_train_loader = DataLoader(dataset=source_train_dataset, batch_size=batch_size_train, num_workers=8, shuffle=True)
 target_train_loader = DataLoader(dataset=target_train_dataset, batch_size=batch_size_train, num_workers=8, shuffle=True)
-target_test_loader = DataLoader(dataset=target_test_dataset, batch_size=batch_size_test, num_workers=8, shuffle=False)
-tsne_loader = DataLoader(dataset=tsne_target_test_dataset, batch_size=batch_size_test, num_workers=8, shuffle=False)
+target_test_loader = DataLoader(dataset=target_test_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
 
 logger = Logger(model_name='classifier_model', data_name='ff', log_path=os.path.join(os.getcwd(), 'tf_logs/dsne_finetune/2classes_finetune/' + str(ft_images_train) + 'images/' + 'run_' + args.run + '/' + args.model_name))
-src_classifier_name = 'vae_train_20k_val3k_mean1_std1_c23_latent16_3blocks_2classes_mixup_flip_normalize_df_nt.pt'
+src_classifier_name = 'train_20k_val3k_mean1_std1_c23_latent16_3blocks_2classes_mixup_flip_normalize_df_nt.pt'
 tgt_classifier_name = args.model_name + '.pt'
 
 transfer_dir = 'df_nt_to_dessa'
@@ -112,31 +54,9 @@ tgt_path_classifier = MODEL_PATH + 'dsne_finetune/2classes_' + str(ft_images_tra
 if not os.path.isdir(tgt_path_classifier):
     makedirs(tgt_path_classifier)
 
-# Losses
-class_weights = torch.Tensor([1, 1]).cuda()
-classification_loss = nn.CrossEntropyLoss(reduction='mean', weight=class_weights)
-
 # Create model objects
-classifier_model = Encoder1(latent_dim=16).to(device)
-
-# # Freeze all layers of classifier model
-# for param in classifier_model.parameters():
-#     param.requires_grad = False
-
-# # set the FC layer + last block gradients to true
-# for param in classifier_model.fc1.parameters():
-#     param.requires_grad = True
-# for param in classifier_model.fc2.parameters():
-#     param.requires_grad = True
-# for param in classifier_model.avgpool.parameters():
-#     param.requires_grad = True
-# for param in classifier_model.layer3.parameters():
-#     param.requires_grad = True
-# print(sum(p.numel() for p in classifier_model.parameters() if p.requires_grad))
-
-
-# Optmizers
-optimizer = optim.Adam(classifier_model.parameters(), lr=1e-5)
+classifier_model = Encoder1(latent_dim=latent_dim).to(device)
+optimizer = optim.Adam(classifier_model.parameters(), lr=finetune_lr)
 
 
 def train_classifier(epoch):
@@ -171,13 +91,6 @@ def train_classifier(epoch):
             x_tgt = x_tgt[:x_src.shape[0]]
             y_tgt = y_tgt[:x_src.shape[0]]
 
-        y_src[y_src == 2] = 1
-        y_src[y_src == 3] = 1
-        y_src[y_src == 4] = 1
-        y_tgt[y_tgt == 2] = 1
-        y_tgt[y_tgt == 3] = 1
-        y_tgt[y_tgt == 4] = 1
-
 
         optimizer.zero_grad()
         z_src, y_hat_src = classifier_model(x_src)
@@ -208,8 +121,8 @@ def train_classifier(epoch):
             print("Best model saved/updated..")
         else:
             counter += 1
-            print("EarlyStopping counter: " + str(counter) + " out of " + str(patience))
-            if counter >= patience:
+            print("EarlyStopping counter: " + str(counter) + " out of " + str(finetune_patience))
+            if counter >= finetune_patience:
                 early_stop = True
         # If early stopping flag is true, then stop the training
         if early_stop:
@@ -231,8 +144,6 @@ def fine_tune_dsne_on_target():
         is_exit = train_classifier(epoch)
         if is_exit:
             break
-        # if epoch % 10 == 0:
-        #     visualize_latent_tsne(loader=tsne_loader, file_name=tsne_dir+"/abc_" + str(epoch), best_path=tgt_path_vae_best, model_name=vae_target, model=tgt_vae_model)
 
 
 def test_classifier_after_training(data_loader):
@@ -245,9 +156,6 @@ def test_classifier_after_training(data_loader):
         for i, (data, labels) in enumerate(tqdm.tqdm(data_loader, desc='')):
             data = data.to(device)
             labels = labels.to(device)
-            labels[labels == 2] = 1
-            labels[labels == 3] = 1
-            labels[labels == 4] = 1
             _, label_hat = classifier_model(data)
             loss = classification_loss(label_hat, labels)
             test_loss += loss.item()
@@ -271,13 +179,16 @@ if __name__ == "__main__":
 
     # TRAIN
     # Method 1 : Directly fine-tune the network
-    fine_tune_dsne_on_target()
+    if train_mode == 'train':
+        fine_tune_dsne_on_target()
 
     # ************** TARGET **********************
-    checkpoint_vae_tgt = torch.load(tgt_path_classifier + tgt_classifier_name)
-    classifier_model.load_state_dict(checkpoint_vae_tgt)
+    elif train_mode == 'test':
+        checkpoint_vae_tgt = torch.load(tgt_path_classifier + tgt_classifier_name)
+        classifier_model.load_state_dict(checkpoint_vae_tgt)
 
-    print("After fine-tuning, Target")
-    tgt_acc, tgt_loss = test_classifier_after_training(data_loader=target_test_loader)
+        print("After fine-tuning, Target")
+        tgt_acc, tgt_loss = test_classifier_after_training(data_loader=target_test_loader)
 
-
+    else:
+        print("Sorry!! Invalid Mode..")
