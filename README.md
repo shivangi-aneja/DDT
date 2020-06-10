@@ -92,7 +92,7 @@ Other Transfer Methods(change filename if needed) : `./script_other_tl_resnet.sh
 
 
 
-
+<!--  
 ## 4. Results
 
 ### Zero-Shot Results
@@ -152,6 +152,6 @@ Other Transfer Methods(change filename if needed) : `./script_other_tl_resnet.sh
 
 
 
-<!--  
+
 Trello Board [here](https://trello.com/b/wvafcTj1/master-thesis-todos)
 -->
