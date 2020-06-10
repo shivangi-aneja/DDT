@@ -15,22 +15,20 @@ For setting up environment, please read [SETUP.md](SETUP.md)
     <img src='/figures/datasets.jpg' width="100%"  alt='Datasets' />
 </figure>
 </p>
-Please contact the respective authors to get the datasets. Except (AIF) dataset which is donated by the company [AI Foundation](https://aifoundation.com/) to the authors anc can be downloaded with link below.  
+   
+
+Please contact the respective authors to get the datasets. Except AIF dataset which is donated by the company, [AI Foundation](https://aifoundation.com/) to the authors and can be downloaded with [this link](https://www.dropbox.com/s/arnx7s13hm129ra/AIF.zip).
 
 | [FaceForensics ++ ](https://arxiv.org/pdf/1901.08971.pdf)  | [Google DFDC](https://ai.googleblog.com/2019/09/contributing-data-to-deepfake-detection.html) | [Dessa](https://www.dessa.com/post/deepfake-detection-that-actually-works) | [Celeb DF(v2)](https://arxiv.org/abs/1909.12962) | [AIF](https://www.dropbox.com/s/arnx7s13hm129ra/AIF.zip) |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
-#### 
-The dataset provides videos for 4 different manipulation methods, namely DeepFakes, Face2Face, FaceSwap, and NeuralTextures and their real counterparts.
 
-
-
-
-### Dataset Splitting
+##### Dataset Splitting used for experiments
 | Dataset  | Train | Val | Test |
 | ------------- | ------------- | ------------- | ------------- |
 | FaceForensics++  | 720  | 140  | 140 |
 | Google DFDC  | - | -  | 28  |
 | Dessa  | 70 | -  | 14  |
+| Celeb DF  | 500 | -  | 90  |
 | AIF  | 12 | -  | 99  |
 
 
