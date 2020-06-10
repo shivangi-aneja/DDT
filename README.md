@@ -1,11 +1,56 @@
-# DDT (Deep Distribution Transfer) : Zero and Few-Shot Transfer for Facial Forgery Detection
-## 0. Links
-[Research Log](https://docs.google.com/document/d/16Equq5mI2USyMEJvcCYkBg37eLqGu-ICjZgOuCcptf0/edit)
+## DDT (Deep Distribution Transfer) : Zero and Few-Shot Transfer for Facial Forgery Detection
 
-For setting up environment, please read `SETUP.md`
+<p float="left">
+<figure>
+    <img src='/figures/method/method.jpg' width="100%"  alt='method' />
+</figure>
+</p>
+
+### 0. Setup
+For setting up environment, please read [SETUP.md](SETUP.md)
+
+## 1. Datasets
+Please contact the respective authors to get the 
+
+#### [FaceForensics ++ Dataset](https://arxiv.org/pdf/1901.08971.pdf)
+The dataset provides videos for 4 different manipulation methods, namely DeepFakes, Face2Face, FaceSwap, and NeuralTextures and their real counterparts.
+<p float="left">
+<figure>
+    <img src='/figures/dataset/faceforensics.png' width="100%"  alt='FaceForensics++' />
+</figure>
+</p>
+
+### [Google DFDC Dataset](https://ai.googleblog.com/2019/09/contributing-data-to-deepfake-detection.html)
+<p float="left">
+<figure>
+    <img src='/figures/dataset/dfdc.jpg' width="70%"  alt='Google DFDC' />
+</figure>
+</p>
+
+### [Dessa Dataset](https://www.dessa.com/post/deepfake-detection-that-actually-works)
+<p float="left">
+<figure>
+    <img src='/figures/dataset/dessa.png' width="70%"  alt='Google DFDC' />
+</figure>
+</p>
+
+### [AIF Dataset](https://aifoundation.com/)
+<p float="left">
+<figure>
+    <img src='/figures/dataset/aif_images.png' width="100%"  alt='Google DFDC' />
+</figure>
+</p>
+
+### Dataset Splitting
+| Dataset  | Train | Val | Test |
+| ------------- | ------------- | ------------- | ------------- |
+| FaceForensics++  | 720  | 140  | 140 |
+| Google DFDC  | - | -  | 28  |
+| Dessa  | 70 | -  | 14  |
+| AIF  | 12 | -  | 99  |
 
 
-## 1. Training and Testing (Zero-Shot)
+### 1. Training and Testing (Zero-Shot)
 
 To train/test Classifier, run the file `train_classifier.py`
 
@@ -73,44 +118,7 @@ Other Transfer Methods(change filename if needed) : `./script_other_tl_resnet.sh
 
 
 
-## 3. Datasets Used
 
-### [FaceForensics ++ Dataset](https://arxiv.org/pdf/1901.08971.pdf)
-The dataset provides videos for 4 different manipulation methods, namely DeepFakes, Face2Face, FaceSwap, and NeuralTextures and their real counterparts.
-<p float="left">
-<figure>
-    <img src='/figures/dataset/faceforensics.png' width="100%"  alt='FaceForensics++' />
-</figure>
-</p>
-
-### [Google DFDC Dataset](https://ai.googleblog.com/2019/09/contributing-data-to-deepfake-detection.html)
-<p float="left">
-<figure>
-    <img src='/figures/dataset/dfdc.jpg' width="70%"  alt='Google DFDC' />
-</figure>
-</p>
-
-### [Dessa Dataset](https://www.dessa.com/post/deepfake-detection-that-actually-works)
-<p float="left">
-<figure>
-    <img src='/figures/dataset/dessa.png' width="70%"  alt='Google DFDC' />
-</figure>
-</p>
-
-### [AIF Dataset](https://aifoundation.com/)
-<p float="left">
-<figure>
-    <img src='/figures/dataset/aif_images.png' width="100%"  alt='Google DFDC' />
-</figure>
-</p>
-
-### Dataset Splitting
-| Dataset  | Train | Val | Test |
-| ------------- | ------------- | ------------- | ------------- |
-| FaceForensics++  | 720  | 140  | 140 |
-| Google DFDC  | - | -  | 28  |
-| Dessa  | 70 | -  | 14  |
-| AIF  | 12 | -  | 99  |
 
 ## 4. Results
 
