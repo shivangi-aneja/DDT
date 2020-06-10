@@ -1,33 +1,26 @@
 from __future__ import print_function
 import argparse
-import torch
 import torch.utils.data
 import numpy as np
+from os import makedirs
 from torch import optim
 from common.logging.tf_logger import Logger
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from tqdm import tqdm
 from config import *
+from common.utils.ddt_utils import ddt_loss
 from common.models.resnet_subset_models import DDTEncoder1 as Encoder
 from common.losses.custom_losses import wasserstein_distance_vector
 
-parser = argparse.ArgumentParser(description='VAE FaceForensics++ ')
-parser.add_argument('--batch_size', type=int, default=128, metavar='N',
-                    help='input batch size for training (default: 128)')
+parser = argparse.ArgumentParser(description='DDT FaceForensics++')
 parser.add_argument('--train_mode', type=str, default='train', metavar='N',
                     help='training mode (train, test)')
-parser.add_argument('--latent_dim', '-l', type=int, default=16, metavar='N',
-                    help='latent embedding size (default: 128)')
 parser.add_argument('--epochs', type=int, default=500, metavar='N',
-                    help='number of epochs to train (default: 10)')
-parser.add_argument('--num_classes', type=int, default=2, metavar='N',
-                    help='Number of classes (N fakes + 1 real)')
+                    help='number of epochs to train (default: 500)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='enables CUDA training')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
-parser.add_argument('-div_loss', '--div_loss', type=str,
-                    default='wasserstein', help='Divergence Loss')
 parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                     help='how many batches to wait before logging training status')
 
@@ -37,60 +30,21 @@ args.cuda = not args.no_cuda and torch.cuda.is_available()
 torch.manual_seed(args.seed)
 device = torch.device("cuda" if args.cuda else "cpu")
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
-
-num_classes = len(fake_classes) + 1
 train_mode = args.train_mode
-batch_size = args.batch_size
-latent_dim = args.latent_dim
 
-orig_weight_factor = num_classes - 1
-
+# Models
 model_name = 'ddt_train_20k_val3k_mean1_std1_c23_latent' + str(latent_dim) + '_3blocks_2classes_flip_normalize_nt'
 logger = Logger(model_name='ddt_model', data_name='ff',
                 log_path=os.path.join(os.getcwd(), 'tf_logs/ddt/2classes/' + model_name))
 model_name = model_name + '.pt'
-
-# Real mean
-mean1 = torch.zeros(int(latent_dim)).cuda()
-mean1[:int(latent_dim / 2)] = 1
-mean1[int(latent_dim / 2):] = 0
-# Fake mean
-mean2 = torch.zeros(int(latent_dim)).cuda()
-mean2[:int(latent_dim / 2)] = 0
-mean2[int(latent_dim / 2):] = 1
-
-# Losses
-class_weights = torch.Tensor([orig_weight_factor, 1]).cuda()
-div_loss = DIV_LOSSES[args.div_loss]
+best_path = MODEL_PATH + 'ddt/' + dataset_mode + '/2classes/best/'
+if not os.path.isdir(best_path):
+    makedirs(best_path)
 
 # Models and optimizers
 model = Encoder(latent_dim=latent_dim).to(device)
 optimizer = optim.Adam(model.parameters(), lr=train_lr)
-scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.7, patience=10, verbose=True)
-
-
-# divergence loss summed over all elements and batch normalized
-def loss_function(mu, logvar, labels):
-    mu = torch.abs(mu)
-
-    orig_indices = (labels == 0).nonzero().squeeze(1)
-    fake_indices = (labels == 1).nonzero().squeeze(1)
-
-    mu_orig = torch.index_select(mu, dim=0, index=orig_indices, out=None)
-    mu_fake = torch.index_select(mu, dim=0, index=fake_indices, out=None)
-
-    logvar_orig = torch.index_select(logvar, dim=0, index=orig_indices, out=None)
-    logvar_fake = torch.index_select(logvar, dim=0, index=fake_indices, out=None)
-
-    kl_orig = orig_weight_factor * div_loss(mu=mu_orig, logvar=logvar_orig, mean=mean1)
-    kl_fake = div_loss(mu=mu_fake, logvar=logvar_fake, mean=mean2)
-
-    real_count = mu_orig.shape[0]
-    fake_count = mu_fake.shape[0]
-    kl_loss = (kl_orig + kl_fake) / (fake_count + orig_weight_factor * real_count)
-
-    loss = kl_loss
-    return loss
+scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=scheduler_factor, patience=scheduler_patience, verbose=True)
 
 
 def test_classifier_ddt_style():
@@ -111,9 +65,6 @@ def test_classifier_ddt_style():
         for i, (data, labels) in enumerate(tqdm(test_loader, desc='')):
             data = data.to(device)
             labels = labels.to(device)
-            labels[labels == 2] = 1
-            labels[labels == 3] = 1
-            labels[labels == 4] = 1
 
             z, mu, logvar = model(data)
 
@@ -161,12 +112,10 @@ def train_ddt(epoch, train_loader):
     for batch_idx, (data, labels) in enumerate(tbar):
         data = data.to(device)
         labels = labels.to(device)
-        labels[labels == 2] = 1
-        labels[labels == 3] = 1
-        labels[labels == 4] = 1
+
         optimizer.zero_grad()
         z, mu, logvar = model(data)
-        loss = loss_function(mu, logvar, labels)
+        loss = ddt_loss(mu, logvar, labels)
         loss.backward()
         train_loss += loss.item()
         optimizer.step()
@@ -190,11 +139,8 @@ def test_ddt(epoch):
         for i, (data, labels) in enumerate(tqdm(test_loader, desc='')):
             data = data.to(device)
             labels = labels.to(device)
-            labels[labels == 2] = 1
-            labels[labels == 3] = 1
-            labels[labels == 4] = 1
             z, mu, logvar = model(data)
-            loss = loss_function(mu, logvar, labels)
+            loss = ddt_loss(mu, logvar, labels)
             test_loss += loss.item()
 
     logger.log(mode="test", error=test_loss / len(test_loader), epoch=epoch, n_batch=0, num_batches=1,
@@ -239,5 +185,9 @@ def train_model_ddt():
 
 
 if __name__ == "__main__":
-    train_model_ddt()
-    test_classifier_ddt_style()
+    if train_mode == 'train':
+        train_model_ddt()
+    elif train_mode == 'test':
+        test_classifier_ddt_style()
+    else:
+        print("Sorry!! Invalid Mode..")

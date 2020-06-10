@@ -1,96 +1,48 @@
 from __future__ import print_function
 import argparse
-import torch
-import os
 import torch.utils.data
 import numpy as np
-from common.utils.dataset import make_dataset
-from common.utils.common_utils import visualize_latent_tsne_classifier
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-from torch.utils.data import DataLoader
-from torch import nn, optim
+from torch import optim
 from os import makedirs
-from torchvision import transforms
+from config import *
 from common.logging.tf_logger import Logger
 from tqdm import tqdm
 from common.models.resnet_subset_models import EncoderLatent as Encoder1
 
-parser = argparse.ArgumentParser(description='FaceForensics++ ResNet Classifier')
-parser.add_argument('--batch-size', type=int, default=128, metavar='N',
-                    help='input batch size for training (default: 128)')
-parser.add_argument('--epochs', type=int, default=10000, metavar='N',
-                    help='number of epochs to train (default: 10)')
+parser = argparse.ArgumentParser(description='Classifier FaceForensics++')
+parser.add_argument('--train_mode', type=str, default='train', metavar='N',
+                    help='training mode (train, test)')
+parser.add_argument('--epochs', type=int, default=500, metavar='N',
+                    help='number of epochs to train (default: 500)')
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='enables CUDA training')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
+parser.add_argument('--log-interval', type=int, default=10, metavar='N',
+                    help='how many batches to wait before logging training status')
+
+# Parse Arguments
 args = parser.parse_args()
 args.cuda = not args.no_cuda and torch.cuda.is_available()
-
 torch.manual_seed(args.seed)
 device = torch.device("cuda" if args.cuda else "cpu")
-
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
-decay_epochs = 40
+train_mode = args.train_mode
 
-train_path = '/home/shivangi/Desktop/Projects/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
-val_path = '/home/shivangi/Desktop/Projects/master_thesis/data/ff_face_20k/c23/val_6k_c23/'
-
-fake_classes = ['df']
-num_classes = len(fake_classes) + 1
-print(fake_classes)
-
-train_dataset = make_dataset(name='ff', base_path=train_path, num_classes=num_classes, fake_classes=fake_classes,
-                             mode='face', image_count='all',
-                             transform=transforms.Compose([transforms.ToPILImage(),
-                                                           transforms.RandomHorizontalFlip(),
-                                                           transforms.RandomVerticalFlip(),
-                                                           transforms.ToTensor(),
-                                                           transforms.Normalize([0.5] * 3, [0.5] * 3)
-                                                           ]))
-
-test_dataset = make_dataset(name='ff', base_path=val_path, num_classes=num_classes, fake_classes=fake_classes,
-                            mode='face', image_count='all',
-                            transform=transforms.Compose(
-                                [transforms.ToPILImage(),
-                                 transforms.ToTensor(),
-                                 transforms.Normalize([0.5] * 3, [0.5] * 3)]))
-
-tsne_dataset = make_dataset(name='ff', base_path=val_path, num_classes=num_classes, fake_classes=fake_classes,
-                            mode='face', image_count=1000,
-                            transform=transforms.Compose(
-                                [transforms.ToPILImage(),
-                                 transforms.ToTensor(), transforms.Normalize([0.5] * 3, [0.5] * 3)]))
-
-batch_size = 128
-train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, num_workers=8, shuffle=True)
-test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, num_workers=32, shuffle=False)
-tsne_loader = DataLoader(dataset=tsne_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
-
-model = 'vae_train_20k_val3k_mean1_std1_c23_latent16_3blocks_2classes_flip_normalize_nt'
-logger = Logger(model_name='vae_model', data_name='ff', log_path=os.path.join(os.getcwd(), 'tf_logs/classifier/2classes/'+model))
+# Models
+model = 'classifier_train_20k_val3k_mean1_std1_c23_latent16_3blocks_2classes_flip_normalize_nt'
+logger = Logger(model_name='classifier_model', data_name='ff', log_path=os.path.join(os.getcwd(), 'tf_logs/classifier/2classes/'+model))
 model_name = model + '.pt'
-
-# Paths
 MODEL_PATH = os.path.join(os.getcwd(), 'models/')
-best_path = MODEL_PATH + 'classifier/face/2classes/best/'
-
+best_path = MODEL_PATH + 'classifier/' + dataset_mode + '/2classes/best/'
 if not os.path.isdir(best_path):
     makedirs(best_path)
 
-orig_class_weight = num_classes - 1
-
-# Losses
-class_weights = torch.Tensor([orig_class_weight, 1]).cuda()
-classification_loss = nn.CrossEntropyLoss(reduction='mean', weight=class_weights)
-
-# Create model objects
-resnet_classifier = Encoder1(latent_dim=16).to(device)
-
-# VAE optimizer
-lr = 1e-4
-optimizer = optim.Adam(resnet_classifier.parameters(), lr=lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=True)
-scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=0.7, patience=5, verbose=True)
+# Models and optimizers
+resnet_classifier = Encoder1(latent_dim=latent_dim).to(device)
+optimizer = optim.Adam(resnet_classifier.parameters(), lr=train_lr)
+scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=scheduler_factor, patience=scheduler_patience, verbose=True)
 
 
 def train_classifier_epoch(epoch):
@@ -104,9 +56,7 @@ def train_classifier_epoch(epoch):
     for batch_idx, (data, labels) in enumerate(tbar):
         data = data.to(device)
         labels = labels.to(device)
-        labels[labels == 2] = 1
-        labels[labels == 3] = 1
-        labels[labels == 4] = 1
+
         _, label_hat = resnet_classifier(data)
         loss = classification_loss(label_hat, labels)
         loss.backward()
@@ -136,9 +86,7 @@ def test_classifier_epoch(epoch):
         for i, (data, labels) in enumerate(tqdm(test_loader, desc='')):
             data = data.to(device)
             labels = labels.to(device)
-            labels[labels == 2] = 1
-            labels[labels == 3] = 1
-            labels[labels == 4] = 1
+
             _, label_hat = resnet_classifier(data)
             loss = classification_loss(label_hat, labels)
             test_loss += loss.item()
@@ -175,9 +123,7 @@ def test_classifier_after_training():
         for i, (data, labels) in enumerate(tqdm(test_loader, desc='')):
             data = data.to(device)
             labels = labels.to(device)
-            labels[labels == 2] = 1
-            labels[labels == 3] = 1
-            labels[labels == 4] = 1
+
             _, label_hat = resnet_classifier(data)
             loss = classification_loss(label_hat, labels)
             test_loss += loss.item()
@@ -223,6 +169,9 @@ def train_classifier():
 
 
 if __name__ == "__main__":
-    train_classifier()
-    test_classifier_after_training()
-    visualize_latent_tsne_classifier(loader=tsne_loader, file_name="classifier", best_path=best_path, model_name=model_name, model=resnet_classifier)
+    if train_mode == 'train':
+        train_classifier()
+    elif train_mode == 'test':
+        test_classifier_after_training()
+    else:
+        print("Sorry!! Invalid Mode..")
