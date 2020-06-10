@@ -22,7 +22,7 @@ Please contact the respective authors to get the datasets. Except AIF dataset wh
 | [FaceForensics ++ ](https://arxiv.org/pdf/1901.08971.pdf)  | [Google DFDC](https://ai.googleblog.com/2019/09/contributing-data-to-deepfake-detection.html) | [Dessa](https://www.dessa.com/post/deepfake-detection-that-actually-works) | [Celeb DF(v2)](https://arxiv.org/abs/1909.12962) | [AIF](https://www.dropbox.com/s/arnx7s13hm129ra/AIF.zip) |
 | ------------- | ------------- | ------------- | ------------- | ------------- |
 
-##### Dataset Splitting used for experiments
+#### Dataset Split-up used for experiments
 | Dataset  | Train | Val | Test |
 | ------------- | ------------- | ------------- | ------------- |
 | FaceForensics++  | 720  | 140  | 140 |

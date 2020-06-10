@@ -1,17 +1,10 @@
-import json
 import cv2
-import numpy as np
 from os import makedirs
-import shutil
 import dlib
-import imutils
 from imutils import face_utils
-from facenet_pytorch import MTCNN
 from os.path import isdir, join, isfile
 from os import listdir
-import pandas as pd
 from tqdm import tqdm
-import json
 import os
 from common.utils.common_utils import get_frame_list, rect_to_bb
 
@@ -19,30 +12,6 @@ from common.utils.common_utils import get_frame_list, rect_to_bb
 model_path = '/home/shivangi/Desktop/Projects/pretrained_models/shape_predictor_68_face_landmarks.dat'
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(model_path)
-
-
-def write_out_videos_dfdc(json_file_path, video_path, output_path):
-
-    file_list = pd.read_json(json_file_path)
-    col_list = list(file_list.columns)
-
-    for i, video_fn in enumerate(tqdm(col_list)):
-        print(video_fn)
-        # dir_name = video_fn.split('.')[0]
-        video_details = file_list[video_fn]
-        class_label = video_details['label']
-        corresponding_real = video_details['original']
-
-        # Video reader
-        # video_reader = cv2.VideoCapture(join(video_path, video_fn))
-        # num_frames = int(video_reader.get(cv2.CAP_PROP_FRAME_COUNT))
-        # success_img, df_image = video_reader.read()
-        # count = 0
-
-        # Write out mask images
-        comp_out_path = join(output_path, class_label)
-        os.makedirs(comp_out_path, exist_ok=True)
-        shutil.copy(join(video_path, video_fn), comp_out_path)
 
 
 def write_out_images_dfdc(video_path, image_path):
@@ -85,7 +54,6 @@ def split_images(source_path, dest_path):
 
 def create_face_crops(src_path, dest_path):
     dir_list = [os.path.join(src_path, f) for f in listdir(src_path) if isdir(join(src_path, f))]
-    mtcnn = MTCNN(keep_all=True)
     for dir in dir_list:
         dir_image_path = [os.path.join(f) for f in listdir(dir) if isdir(join(dir))]
         print(dir)
@@ -93,9 +61,6 @@ def create_face_crops(src_path, dest_path):
             for image in sorted(dir_image_path):
                 if image.endswith(".png"):
                     img = cv2.imread(dir + '/' + image)
-                    # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                    # gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                    # resize_img = imutils.resize(img, width=500)
                     rects = detector(img, 1)
                     # rects, _ = mtcnn.detect(img)
                     if len(rects) == 0:
@@ -103,12 +68,9 @@ def create_face_crops(src_path, dest_path):
                     else:
                         for i in range(len(rects)):
                             (x, y, w, h) = face_utils.rect_to_bb(rects[i])
-                            # (x, y, w, h) = rects[i]
-                            # print(x, y, w, h)
                             y_min = max(0, y - 30)
                             x_min = max(0, x - 30)
                             face_img = img[y_min:y + h + 30, x_min:x + w + 30]
-                            # face_img = img[int(y_min):int(y + h), int(x_min):int(x + w)]
                             face_img = cv2.resize(face_img, (256, 256))
                             os.makedirs(dest_path + dir.split('/')[-1], exist_ok=True)
                             cv2.imwrite(dest_path + dir.split('/')[-1] + '/' + image.split(".")[0] + '_' + str(i) + '.png', face_img)
@@ -124,8 +86,6 @@ if __name__ == "__main__":
     src_path = '/media/newhd/FaceDatasets/FaceForensics/c23/face_crops/c23/test/Deepfakes/'
     dest_path = '/media/newhd/FaceImages/Dessa/c23/face_crops/train/fake/'
     # write_out_videos_dfdc(json_file_path=json_file_path, video_path=video_path, output_path=output_path)
-    # print(video_path)
-    # print(dest_path)
     # write_out_images_dfdc(video_path, image_path)
     split_images(source_path=image_path, dest_path=image_path_30)
     # create_face_crops(src_path, dest_path)

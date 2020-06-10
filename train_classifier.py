@@ -14,8 +14,6 @@ from torchvision import transforms
 from common.logging.tf_logger import Logger
 from tqdm import tqdm
 from common.models.resnet_subset_models import EncoderLatent as Encoder1
-from sklearn.metrics import confusion_matrix
-from create_plot import print_confusion_matrix
 
 parser = argparse.ArgumentParser(description='FaceForensics++ ResNet Classifier')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
@@ -194,9 +192,6 @@ def test_classifier_after_training():
         # Calculate accuracy for current epoch
         accuracy = 100 * correct / total
     print('====> Avg loss: {:.4f}   Accuracy: {:.4f}'.format(test_loss / len(test_loader), accuracy))
-    cm = confusion_matrix(y_true=labels_all.cpu().numpy(), y_pred=predictions.cpu().numpy())
-    cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-    print_confusion_matrix(confusion_matrix=cm, class_names=['Real', 'Fake'], filename='classifier_cm')
 
 
 def train_classifier():

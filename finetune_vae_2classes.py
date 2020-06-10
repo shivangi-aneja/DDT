@@ -17,7 +17,7 @@ from tqdm import tqdm
 
 from common.logging.tf_logger import Logger
 from common.losses.custom_losses import wasserstein_distance, kl_with_gaussian_unit_std, wasserstein_distance_vector
-from common.models.resnet_subset_models import VariationalEncoder1 as Encoder
+from common.models.resnet_subset_models import DDTEncoder1 as Encoder
 from common.utils.dataset import make_dataset
 
 parser = argparse.ArgumentParser(description='VAE FaceForensics++ Transfer Learning')

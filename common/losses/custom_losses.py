@@ -1,11 +1,12 @@
 """
-Custom Loss implementation for Activation Loss
+Custom Loss implementations
 """
 import torch
 import torch.nn.functional as F
 
 m = torch.nn.Softmax(dim=1)
 var_inv = 1
+
 
 def ActivationLoss(activation_vector, y_onehot, weight_vector):
     act_loss = torch.mean(weight_vector.unsqueeze(1).cuda() * torch.abs(activation_vector - y_onehot))
@@ -36,11 +37,13 @@ def wasserstein_distance(mu, logvar, mean):
     distance = distance.sum()
     return distance
 
+
 def wasserstein_distance_vector(mu, logvar, mean):
     unit_var = torch.ones(logvar.shape[1]).float().cuda()
     distance = torch.sqrt(
         torch.sum((mu - mean) ** 2, dim=1) + torch.sum((torch.sqrt(logvar.exp()) - torch.sqrt(unit_var)) ** 2, dim=1))
     return distance
+
 
 def kl_with_gaussian_unit_std(mu, logvar, mean):
     kl_div = -0.5 * torch.sum(1 + logvar - logvar.exp() - (mean - mu).pow(2))
@@ -56,10 +59,12 @@ def wasserstein_distance_mean_only(mu, mean):
 # Constrastive Semantic Alignment Loss
 def csa_loss(x, y, class_eq):
     margin = 1
-    dist = F.pairwise_distance(x, y) # L2 norm pairwise
-    loss = class_eq * dist.pow(2)   # Included distance only for similar classes, different domain
-    loss += (1 - class_eq) * (margin - dist).clamp(min=0).pow(2)    # Include this part only for different classes, different domain
+    dist = F.pairwise_distance(x, y)  # L2 norm pairwise
+    loss = class_eq * dist.pow(2)  # Included distance only for similar classes, different domain
+    loss += (1 - class_eq) * (margin - dist).clamp(min=0).pow(
+        2)  # Include this part only for different classes, different domain
     return loss.mean()
+
 
 # MMD (Maximum Mean Discrepancy) loss
 # Source : https://github.com/tmac1997/DDC-transfer-learning/blob/master/mmd.py
@@ -89,7 +94,7 @@ def coral_loss(source, target):
     return loss
 
 
-def d_sne_loss(z_src, y_src, z_tgt, y_tgt, margin = 1):
+def d_sne_loss(z_src, y_src, z_tgt, y_tgt, margin=1):
     z_src_rpt = z_src.unsqueeze(dim=0)
     z_tgt_rpt = z_tgt.unsqueeze(dim=1)
 

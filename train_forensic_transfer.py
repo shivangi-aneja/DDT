@@ -20,7 +20,6 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from common.models.classifiers import CLASSIFIER
 from common.losses.custom_losses import ActivationLoss
 from sklearn.metrics import confusion_matrix
-from create_plot import print_confusion_matrix
 
 parser = argparse.ArgumentParser(description='Forensic Transfer FaceForensics++ Dataset')
 parser.add_argument('--batch-size', type=int, default=128, metavar='N',
