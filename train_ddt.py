@@ -35,6 +35,7 @@ train_mode = args.train_mode
 
 # Dataloaders
 train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, num_workers=8, shuffle=True)
+val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
 test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
 
 # Models
@@ -141,20 +142,20 @@ def test_ddt(epoch):
     model.eval()
     test_loss = 0
     with torch.no_grad():
-        for i, (data, labels) in enumerate(tqdm(test_loader, desc='')):
+        for i, (data, labels) in enumerate(tqdm(val_loader, desc='')):
             data = data.to(device)
             labels = labels.to(device)
             z, mu, logvar = model(data)
             loss = ddt_loss(mu, logvar, labels)
             test_loss += loss.item()
 
-    logger.log(mode="test", error=test_loss / len(test_loader), epoch=epoch, n_batch=0, num_batches=1,
+    logger.log(mode="test", error=test_loss / len(val_loader), epoch=epoch, n_batch=0, num_batches=1,
                scalar='avg_loss')
     logger.log(mode="test", error=float(optimizer.state_dict()['param_groups'][0]['lr']), epoch=epoch, n_batch=0,
                num_batches=1,
                scalar='lr')
-    print('====> Val Epoch: {} Avg loss: {:.4f} '.format(epoch, test_loss / len(test_loader)))
-    return test_loss / len(test_loader)
+    print('====> Val Epoch: {} Avg loss: {:.4f} '.format(epoch, test_loss / len(val_loader)))
+    return test_loss / len(val_loader)
 
 
 def train_model_ddt():

@@ -45,10 +45,13 @@ class_weights = torch.Tensor([orig_weight_factor, 1]).cuda()
 div_loss = DIV_LOSSES[divergence]
 # ------ Classification Loss
 classification_loss = nn.CrossEntropyLoss(reduction='mean', weight=class_weights)
+# MSE loss
+mse = nn.MSELoss().cuda()
 
 train_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
 train_path_ff = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
-val_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/test/xtra/'
+val_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/val_6k_c23/'
+test_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/test/xtra/'
 
 MODEL_PATH = os.path.join(os.getcwd(), 'pretrained_models/')
 
@@ -64,9 +67,16 @@ train_dataset = make_dataset(name='ff', base_path=train_path, num_classes=num_cl
                                                            ]))
 
 
-test_dataset = make_dataset(name='ff', base_path=val_path, num_classes=num_classes,
-                            mode='face', image_count='all',
-                            transform=transforms.Compose(
+val_dataset = make_dataset(name='ff', base_path=val_path, num_classes=num_classes,
+                           mode='face', image_count='all',
+                           transform=transforms.Compose(
+                                [transforms.ToPILImage(),
+                                 transforms.ToTensor(),
+                                 transforms.Normalize([0.5] * 3, [0.5] * 3)]))
+
+test_dataset = make_dataset(name='ff', base_path=test_path, num_classes=num_classes,
+                           mode='face', image_count='all',
+                           transform=transforms.Compose(
                                 [transforms.ToPILImage(),
                                  transforms.ToTensor(),
                                  transforms.Normalize([0.5] * 3, [0.5] * 3)]))

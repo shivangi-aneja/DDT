@@ -33,13 +33,13 @@ train_mode = args.train_mode
 
 # Dataloaders
 train_loader = DataLoader(dataset=train_dataset, batch_size=batch_size, num_workers=8, shuffle=True)
+val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
 test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
 
 # Models
 model = 'classifier_train_20k_val3k_mean1_std1_c23_latent16_3blocks_2classes_flip_normalize_nt'
 logger = Logger(model_name='classifier_model', data_name='ff', log_path=os.path.join(os.getcwd(), 'tf_logs/classifier/2classes/'+model))
 model_name = model + '.pt'
-MODEL_PATH = os.path.join(os.getcwd(), 'models/')
 best_path = MODEL_PATH + 'classifier/face/2classes/best/'
 if not os.path.isdir(best_path):
     makedirs(best_path)
@@ -88,7 +88,7 @@ def test_classifier_epoch(epoch):
     total = 0
     correct = 0
     with torch.no_grad():
-        for i, (data, labels) in enumerate(tqdm(test_loader, desc='')):
+        for i, (data, labels) in enumerate(tqdm(val_loader, desc='')):
             data = data.to(device)
             labels = labels.to(device)
 
@@ -100,12 +100,12 @@ def test_classifier_epoch(epoch):
             correct += (predicted == labels).sum().item()
         # Calculate accuracy for current epoch
         accuracy = 100 * correct / total
-    logger.log(mode="test", error=test_loss / len(test_loader), epoch=epoch, n_batch=0, num_batches=1,
+    logger.log(mode="test", error=test_loss / len(val_loader), epoch=epoch, n_batch=0, num_batches=1,
                scalar='avg_classification_loss')
     logger.log(mode="test", error=accuracy, epoch=epoch, n_batch=0, num_batches=1,
                scalar='classification_accuracy')
     print(
-        '====> Val Epoch: {} Avg loss: {:.4f}  Accuracy: {:.4f}'.format(epoch, test_loss / len(test_loader), accuracy))
+        '====> Val Epoch: {} Avg loss: {:.4f}  Accuracy: {:.4f}'.format(epoch, test_loss / len(val_loader), accuracy))
     return test_loss
 
 

@@ -3,6 +3,7 @@ Custom Loss implementations
 """
 import torch
 import torch.nn.functional as F
+from common.utils.common_utils import euclidean_dist
 
 m = torch.nn.Softmax(dim=1)
 var_inv = 1
@@ -118,3 +119,44 @@ def d_sne_loss(z_src, y_src, z_tgt, y_tgt, margin=1):
     loss = torch.relu(max_intra_cls_dist - min_inter_cls_dist + margin)
 
     return loss.mean()
+
+
+def prototypical_loss_full(prototypes, z_val, y_val):
+    '''
+    Prototypical Loss Implemented
+    :param z_train:
+    :param y_train:
+    :param z_val:
+    :param y_val:
+    :return:
+    '''
+
+
+    classes = torch.unique(y_val)
+    n_classes = len(classes)
+    n_query_real = None
+    n_query_fake = None
+
+    n_query_real = y_val.eq(classes[0].item()).sum().item()
+    n_query_fake = y_val.eq(classes[1].item()).sum().item()
+    n_query = min(n_query_real, n_query_fake)
+
+
+    query_idx_real = y_val.eq(classes[0].item()).nonzero()[:n_query]
+    query_idx_fake = y_val.eq(classes[1].item()).nonzero()
+    r_perm = torch.randperm(query_idx_fake.shape[0])
+    query_idx_fake = query_idx_fake[r_perm][:n_query]
+    query_idxs = torch.stack((query_idx_real, query_idx_fake)).view(-1)
+    query_samples = z_val[query_idxs]
+    dists = euclidean_dist(query_samples, prototypes)   # total_samples X 2 matrix (every sample distance with everyy prototype)
+
+    log_p_y = F.log_softmax(-dists, dim=1).view(n_classes, n_query, -1)  # 2 X Samples_per_class X 2
+
+    target_inds = torch.arange(0, n_classes)
+    target_inds = target_inds.view(n_classes, 1, 1)
+    target_inds = target_inds.expand(n_classes, n_query, 1).long().cuda()
+
+    loss_val = - torch.gather(log_p_y, 2, target_inds.cuda()).squeeze().view(-1).mean()
+    _, y_hat = log_p_y.max(2)
+    acc_val = y_hat.eq(target_inds.squeeze()).float().mean()
+    return loss_val, acc_val

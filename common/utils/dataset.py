@@ -97,6 +97,7 @@ class FaceDataset(Dataset):
         self.transform = transform
         self.should_invert = should_invert
         self.to_tensor = transforms.ToTensor()
+        self.labels = [0 if "orig" in t else 1 for t in self.image_path]
 
     def __getitem__(self, index):
         # Training input images path
@@ -104,7 +105,7 @@ class FaceDataset(Dataset):
         # Assign label to class
         try:
             input_images = [(t, 0) if "orig" in t else (t, 1) for t in input_images]
-            random_file1, random_file2, random_file3 = None, None, None
+            # random_file1, random_file2, random_file3 = None, None, None
             input_img = cv2.imread(input_images[index][0])
             input_img = np.array(input_img, dtype='uint8')
             input_img = cv2.cvtColor(input_img, cv2.COLOR_BGR2RGB)

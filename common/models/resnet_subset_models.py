@@ -113,3 +113,16 @@ class EncoderLatent(nn.Module):
     def forward(self, x):
         z, out = self.encode(x)
         return z, out
+
+
+class RelationNetwork(nn.Module):
+    """docstring for RelationNetwork"""
+    def __init__(self, input_size, hidden_size):
+        super(RelationNetwork, self).__init__()
+        self.fc1 = nn.Linear(input_size, hidden_size)
+        self.fc2 = nn.Linear(hidden_size, 1)
+
+    def forward(self,x):
+        x = F.relu(self.fc1(x))
+        x = torch.sigmoid(self.fc2(x))
+        return x
