@@ -41,13 +41,13 @@ target_test_loader = DataLoader(dataset=target_test_dataset, batch_size=batch_si
 
 
 logger = Logger(model_name='ddt_model', data_name='ff', log_path=os.path.join(os.getcwd(), 'tf_logs/ddt/2classes_finetune/' + str(ft_images_train) + '_images/' + 'run_' + args.run + '/' + args.model_name))
-ddt_source = 'ddt_train_20k_val3k_mean1_std1_c23_latent16_3blocks_2classes_mixup_flip_normalize_df_nt.pt'
+ddt_source = 'ddt_c23_latent16_2classes_mixup_flip_normalize_ff.pt'
 ddt_target = args.model_name + '.pt'
 
 # Paths
 transfer_dir = 'df_nt_to_dessa'
 src_path_ddt = MODEL_PATH + 'ddt/face/2classes/best/'
-tgt_path_ddt_best = MODEL_PATH + 'ddt_finetune/2classes_' + str(ft_images_train) + 'images/' + transfer_dir + '/' + args.run + '_run/'
+tgt_path_ddt_best = MODEL_PATH + 'ddt_finetune/' + transfer_dir + '/' + str(ft_images_train) + 'images/' + args.run + '_run/'
 
 if not os.path.isdir(tgt_path_ddt_best):
     makedirs(tgt_path_ddt_best)
@@ -67,9 +67,6 @@ def train_ddt(epoch, tgt_ddt_model):
     for batch_idx, (data, labels) in enumerate(tbar):
         data = data.to(device)
         labels = labels.to(device)
-        labels[labels == 2] = 1
-        labels[labels == 3] = 1
-        labels[labels == 4] = 1
         tgt_ddt_optimizer.zero_grad()
         z, mu, logvar = tgt_ddt_model(data)
         loss = ddt_loss(mu, logvar, labels)
@@ -131,9 +128,6 @@ def test_classifier_ddt_style(data_loader):
         for i, (data, labels) in enumerate(tqdm(data_loader, desc='')):
             data = data.to(device)
             labels = labels.to(device)
-            labels[labels == 2] = 1
-            labels[labels == 3] = 1
-            labels[labels == 4] = 1
 
             z, mu, logvar = tgt_ddt_model(data)
 

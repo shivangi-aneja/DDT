@@ -19,7 +19,7 @@ parser.add_argument('--epochs', type=int, default=500, metavar='N',
 parser.add_argument('--no-cuda', action='store_true', default=False,
                     help='enables CUDA training')
 parser.add_argument('-m', '--model_name', type=str,
-                    default='NONE', help='name for model')
+                    default='classifier_model', help='name for model')
 parser.add_argument('-r', '--run', type=str,
                     default='1', help='run number')
 parser.add_argument('--log-interval', type=int, default=10, metavar='N',
@@ -31,6 +31,7 @@ random.seed(int(args.run))
 torch.manual_seed(int(args.run))
 device = torch.device("cuda" if args.cuda else "cpu")
 kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
+train_mode = args.train_mode
 
 # Dataloaders
 target_train_loader = DataLoader(dataset=target_train_dataset, batch_size=batch_size, num_workers=8, shuffle=True)
@@ -38,15 +39,14 @@ target_test_loader = DataLoader(dataset=target_test_dataset, batch_size=batch_si
 
 
 logger = Logger(model_name='classifier_model', data_name='ff', log_path=os.path.join(os.getcwd(), 'tf_logs/classifier/2classes_finetune/' + str(ft_images_train) + 'images/' + 'run_' + args.run + '/' + args.model_name))
-src_classifier_name = 'train_20k_val3k_mean1_std1_c23_latent16_3blocks_2classes_mixup_flip_normalize_df_nt.pt'
+src_classifier_name = 'classifier_c23_latent16_3blocks_2classes_flip_normalize_ff.pt'
 tgt_classifier_name = args.model_name + '.pt'
 
 transfer_dir = 'df_nt_to_dessa'
 
 # Paths
-MODEL_PATH = os.path.join(os.getcwd(), 'models/')
 src_path_classifier = MODEL_PATH + 'classifier/face/2classes/best/'
-tgt_path_classifier = MODEL_PATH + 'classifier_finetune/2classes_' + str(ft_images_train) + 'images/' + transfer_dir +'/' + args.run + '_run/'
+tgt_path_classifier = MODEL_PATH + 'classifier_finetune/' + transfer_dir + '/' + str(ft_images_train) + 'images/' + args.run + '_run/'
 
 if not os.path.isdir(tgt_path_classifier):
     makedirs(tgt_path_classifier)
@@ -65,9 +65,6 @@ def train_classifier(epoch):
     for batch_idx, (data, labels) in enumerate(tbar):
         data = data.to(device)
         labels = labels.to(device)
-        labels[labels == 2] = 1
-        labels[labels == 3] = 1
-        labels[labels == 4] = 1
         optimizer.zero_grad()
         _, label_hat = classifier_model(data)
         loss = classification_loss(label_hat, labels)
@@ -111,9 +108,6 @@ def fine_tune_classifier_on_target():
             print("Early stopping")
             break
 
-        # if epoch % 10 == 0:
-        #     visualize_latent_tsne(loader=tsne_loader, file_name=tsne_dir+"/abc_" + str(epoch), best_path=tgt_path_vae_best, model_name=vae_target, model=tgt_vae_model)
-
 
 def test_classifier_after_training(data_loader):
 
@@ -125,9 +119,6 @@ def test_classifier_after_training(data_loader):
         for i, (data, labels) in enumerate(tqdm(data_loader, desc='')):
             data = data.to(device)
             labels = labels.to(device)
-            labels[labels == 2] = 1
-            labels[labels == 3] = 1
-            labels[labels == 4] = 1
             _, label_hat = classifier_model(data)
             loss = classification_loss(label_hat, labels)
             test_loss += loss.item()
@@ -151,12 +142,17 @@ if __name__ == "__main__":
 
     # TRAIN
     # Method 1 : Directly fine-tune the network
-    fine_tune_classifier_on_target()
+    if train_mode == 'train':
+        fine_tune_classifier_on_target()
 
     # ************** TARGET **********************
-    checkpoint_vae_tgt = torch.load(tgt_path_classifier + tgt_classifier_name)
-    classifier_model.load_state_dict(checkpoint_vae_tgt)
+    elif train_mode == 'test':
+        checkpoint_vae_tgt = torch.load(tgt_path_classifier + tgt_classifier_name)
+        classifier_model.load_state_dict(checkpoint_vae_tgt)
 
-    print("After fine-tuning, Target")
-    test_classifier_after_training(data_loader=target_test_loader)
+        print("After fine-tuning, Target")
+        test_classifier_after_training(data_loader=target_test_loader)
+
+    else:
+        print("Sorry!! Invalid Mode..")
 

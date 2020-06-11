@@ -41,15 +41,14 @@ target_train_loader = DataLoader(dataset=target_train_dataset, batch_size=batch_
 target_test_loader = DataLoader(dataset=target_test_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
 
 logger = Logger(model_name='classifier_model', data_name='ff', log_path=os.path.join(os.getcwd(), 'tf_logs/mmd_finetune/2classes_finetune/' + str(ft_images_train) + 'images/' + 'run_' + args.run + '/' + args.model_name))
-src_classifier_name = 'train_20k_val3k_mean1_std1_c23_latent16_3blocks_2classes_mixup_flip_normalize_df_nt.pt'
+src_classifier_name = 'classifier_c23_latent16_3blocks_2classes_flip_normalize_ff.pt'
 tgt_classifier_name = args.model_name + '.pt'
 
 transfer_dir = 'df_nt_to_dessa'
 
 # Paths
-MODEL_PATH = os.path.join(os.getcwd(), 'models/')
 src_path_classifier = MODEL_PATH + 'classifier/face/2classes/best/'
-tgt_path_classifier = MODEL_PATH + 'mmd_finetune/2classes_' + str(ft_images_train) + 'images/' + transfer_dir +'/' + args.run + '_run/'
+tgt_path_classifier = MODEL_PATH + 'mmd_finetune/' + transfer_dir + '/' + str(ft_images_train) + 'images/' + args.run + '_run/'
 
 if not os.path.isdir(tgt_path_classifier):
     makedirs(tgt_path_classifier)
@@ -92,14 +91,6 @@ def train_classifier(epoch):
             x_tgt = x_tgt[:x_src.shape[0]]
             y_tgt = y_tgt[:x_src.shape[0]]
 
-        y_src[y_src == 2] = 1
-        y_src[y_src == 3] = 1
-        y_src[y_src == 4] = 1
-        y_tgt[y_tgt == 2] = 1
-        y_tgt[y_tgt == 3] = 1
-        y_tgt[y_tgt == 4] = 1
-
-
         optimizer.zero_grad()
         z_src, y_hat_src = classifier_model(x_src)
         z_tgt, y_hat_tgt = classifier_model(x_tgt)
@@ -128,6 +119,7 @@ def train_classifier(epoch):
             print("Early stopping")
             return True
 
+
 def fine_tune_mmd_on_target():
 
     try:
@@ -143,8 +135,6 @@ def fine_tune_mmd_on_target():
         is_exit = train_classifier(epoch)
         if is_exit:
             break
-        # if epoch % 10 == 0:
-        #     visualize_latent_tsne(loader=tsne_loader, file_name=tsne_dir+"/abc_" + str(epoch), best_path=tgt_path_vae_best, model_name=vae_target, model=tgt_vae_model)
 
 
 def test_classifier_after_training(data_loader):
@@ -157,9 +147,6 @@ def test_classifier_after_training(data_loader):
         for i, (data, labels) in enumerate(tqdm.tqdm(data_loader, desc='')):
             data = data.to(device)
             labels = labels.to(device)
-            labels[labels == 2] = 1
-            labels[labels == 3] = 1
-            labels[labels == 4] = 1
             _, label_hat = classifier_model(data)
             loss = classification_loss(label_hat, labels)
             test_loss += loss.item()

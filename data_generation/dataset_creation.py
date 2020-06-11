@@ -9,7 +9,7 @@ import os
 from common.utils.common_utils import get_frame_list, rect_to_bb
 
 
-model_path = '/home/shivangi/Desktop/Projects/pretrained_models/shape_predictor_68_face_landmarks.dat'
+model_path = '/home/Desktop/Projects/pretrained_models/shape_predictor_68_face_landmarks.dat'
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor(model_path)
 

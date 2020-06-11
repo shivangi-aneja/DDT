@@ -41,15 +41,14 @@ target_train_loader = DataLoader(dataset=target_train_dataset, batch_size=batch_
 target_test_loader = DataLoader(dataset=target_test_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
 
 logger = Logger(model_name='classifier_model', data_name='ff', log_path=os.path.join(os.getcwd(), 'tf_logs/dsne_finetune/2classes_finetune/' + str(ft_images_train) + 'images/' + 'run_' + args.run + '/' + args.model_name))
-src_classifier_name = 'train_20k_val3k_mean1_std1_c23_latent16_3blocks_2classes_mixup_flip_normalize_df_nt.pt'
+src_classifier_name = 'classifier_c23_latent16_3blocks_2classes_flip_normalize_ff.pt'
 tgt_classifier_name = args.model_name + '.pt'
 
 transfer_dir = 'df_nt_to_dessa'
 
 # Paths
-MODEL_PATH = os.path.join(os.getcwd(), 'models/')
 src_path_classifier = MODEL_PATH + 'classifier/face/2classes/best/'
-tgt_path_classifier = MODEL_PATH + 'dsne_finetune/2classes_' + str(ft_images_train) + 'images/' + transfer_dir +'/' + args.run + '_run/'
+tgt_path_classifier = MODEL_PATH + 'dsne_finetune/' + transfer_dir + '/' + str(ft_images_train) + 'images/' + args.run + '_run/'
 
 if not os.path.isdir(tgt_path_classifier):
     makedirs(tgt_path_classifier)

@@ -1,35 +1,31 @@
 #!/bin/bash 
 
-# activate the virtual environment
-source ../env/venv/bin/activate
-
 echo "Images:25 Run 1"
-python finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last  -r 1  &&
+python3 finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last  -r 1 --train_mode train  &&
 
 echo "Images:25 Run 2"
-python finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last  -r 2  &&
+python3 finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last  -r 2 --train_mode train  &&
 
 echo "Images:25 Run 3"
-python finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 3   &&
+python3 finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 3  --train_mode train  &&
 
 echo "Images:25 Run 4"
-python finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 4   &&
+python3 finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 4  --train_mode train  &&
 
 echo "Images:25 Run 5"
-python finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 5   &&
+python3 finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 5  --train_mode train  &&
 
 echo "Images:25 Run 6"
-python finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 6   &&
+python3 finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 6  --train_mode train  &&
 
 echo "Images:25 Run 7"
-python finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 7   &&
+python3 finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 7  --train_mode train  &&
 
 echo "Images:25 Run 8"
-python finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 8   &&
+python3 finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 8  --train_mode train  &&
 
 echo "Images:25 Run 9"
-python finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 9   &&
+python3 finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 9  --train_mode train  &&
 
 echo "Images:25 Run 10"
-python finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 10 
-#python calc_mean.py
+python3 finetune_ccsa.py -m classifier_c23_latent128_resnet3blocks_2classes_update_last -r 10 --train_mode train

@@ -48,10 +48,10 @@ classification_loss = nn.CrossEntropyLoss(reduction='mean', weight=class_weights
 # MSE loss
 mse = nn.MSELoss().cuda()
 
-train_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
-train_path_ff = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
-val_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/val_6k_c23/'
-test_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/test/'
+train_path = '/home/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
+train_path_ff = '/home/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
+val_path = '/home/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/val_6k_c23/'
+test_path = '/home/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/test/'
 
 MODEL_PATH = os.path.join(os.getcwd(), 'models/')
 
@@ -87,10 +87,10 @@ batch_size_train = min(2*ft_images_train, batch_size)
 src_fake_classes = ['fake']
 target_fake_classes = ['fake']
 
-src_train_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
-tgt_train_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
-val_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/val_6k_c23/'
-test_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/test/'
+src_train_path = '/home/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
+tgt_train_path = '/home/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
+val_path = '/home/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/val_6k_c23/'
+test_path = '/home/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/test/'
 
 source_train_dataset = make_dataset(name='ff', base_path=src_train_path, num_classes=len(src_fake_classes)+1,
                              mode='face', image_count='all',
@@ -111,12 +111,12 @@ target_train_dataset = make_dataset(name='ff', base_path=tgt_train_path, num_cla
                                                                   transforms.Normalize([0.5] * 3, [0.5] * 3)]))
 
 
-target_val_dataset = make_dataset(name='ff', base_path=val_path, num_classes=len(target_fake_classes)+1,
-                                    mode='face', image_count='all',
-                                   transform=transforms.Compose(
-                                       [transforms.ToPILImage(),
-                                        transforms.ToTensor(),
-                                        transforms.Normalize([0.5] * 3, [0.5] * 3)]))
+# target_val_dataset = make_dataset(name='ff', base_path=val_path, num_classes=len(target_fake_classes)+1,
+#                                     mode='face', image_count='all',
+#                                    transform=transforms.Compose(
+#                                        [transforms.ToPILImage(),
+#                                         transforms.ToTensor(),
+#                                         transforms.Normalize([0.5] * 3, [0.5] * 3)]))
 
 
 target_test_dataset = make_dataset(name='ff', base_path=test_path, num_classes=len(target_fake_classes) + 1,

@@ -39,17 +39,16 @@ train_mode = args.train_mode
 
 source_train_loader = DataLoader(dataset=source_train_dataset, batch_size=batch_size, num_workers=8, shuffle=True)
 target_train_loader = DataLoader(dataset=target_train_dataset, batch_size=batch_size, num_workers=8, shuffle=True)
-target_val_loader = DataLoader(dataset=target_val_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
 target_test_loader = DataLoader(dataset=target_test_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
 
 logger = Logger(model_name='protonet', data_name='ff', log_path=os.path.join(os.getcwd(), 'tf_logs/protonet/2classes_finetune/' + str(ft_images_train) + '_images/' + 'run_' + args.run + '/' + args.model_name))
-protonet_source = 'protonet_train_20k_val3k_latent16_3blocks_2classes_mixup_flip_normalize_nt_df.pt'
+protonet_source = 'protonet_c23_latent16_3blocks_2classes_mixup_flip_normalize_ff.pt'
 protonet_target = args.model_name + '.pt'
 proto_file_name = args.model_name + '.npy'
 
 transfer_dir = 'df_nt_to_dessa'
 src_path_protonet = MODEL_PATH + 'protonet/face/2classes/best_mixup/'
-tgt_path_protonet_best = MODEL_PATH + 'protonet_finetune/2classes_' + str(ft_images_train) + 'images/' + transfer_dir +'/' + args.run + '_run/'
+tgt_path_protonet_best = MODEL_PATH + 'protonet_finetune/' + transfer_dir + '/' + str(ft_images_train) + 'images/' + args.run + '_run/'
 if not os.path.isdir(tgt_path_protonet_best):
     makedirs(tgt_path_protonet_best)
 
@@ -210,7 +209,6 @@ if __name__ == "__main__":
         checkpoint_protonet_tgt = torch.load(tgt_path_protonet_best + protonet_target)
         tgt_protonet_model.load_state_dict(checkpoint_protonet_tgt)
         save_prototype_embeddings()
-        test_protonet_after_finetuning(data_loader=target_val_loader)
 
     elif train_mode == 'test':
         # VALIDATION
