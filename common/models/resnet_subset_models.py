@@ -1,6 +1,7 @@
 from torchvision import models
 import torch
 from torch import nn
+import torch.nn.functional as F
 
 
 class DDTEncoder1(nn.Module):

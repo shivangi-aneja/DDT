@@ -39,7 +39,7 @@ val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size, num_workers=
 test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
 
 # Models
-model_name = 'ddt_train_20k_val3k_mean1_std1_c23_latent' + str(latent_dim) + '_3blocks_2classes_mixup_flip_normalize_df_nt'
+model_name = 'ddt_c23_latent' + str(latent_dim) + '_2classes_mixup_flip_normalize_ff'
 logger = Logger(model_name='ddt_model', data_name='ff',
                 log_path=os.path.join(os.getcwd(), 'tf_logs/ddt/2classes/' + model_name))
 model_name = model_name + '.pt'

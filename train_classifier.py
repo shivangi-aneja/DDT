@@ -37,7 +37,7 @@ val_loader = DataLoader(dataset=val_dataset, batch_size=batch_size, num_workers=
 test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, num_workers=8, shuffle=False)
 
 # Models
-model = 'classifier_train_20k_val3k_mean1_std1_c23_latent16_3blocks_2classes_flip_normalize_nt'
+model = 'classifier_c23_latent16_3blocks_2classes_flip_normalize_ff'
 logger = Logger(model_name='classifier_model', data_name='ff', log_path=os.path.join(os.getcwd(), 'tf_logs/classifier/2classes/'+model))
 model_name = model + '.pt'
 best_path = MODEL_PATH + 'classifier/face/2classes/best/'
@@ -147,7 +147,6 @@ def test_classifier_after_training():
 
 def train_classifier():
 
-    patience = 10
     best_loss = np.Inf
     early_stop = False
     counter = 0
@@ -164,8 +163,8 @@ def train_classifier():
             print("Best model saved/updated..")
         else:
             counter += 1
-            print("EarlyStopping counter: " + str(counter) + " out of " + str(patience))
-            if counter >= patience:
+            print("EarlyStopping counter: " + str(counter) + " out of " + str(train_patience))
+            if counter >= train_patience:
                 early_stop = True
         # If early stopping flag is true, then stop the training
         if early_stop:

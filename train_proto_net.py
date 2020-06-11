@@ -49,8 +49,8 @@ test_loader = DataLoader(dataset=test_dataset, batch_size=batch_size, num_worker
 
 
 # Models
-model_name = 'protonet_train_20k_val3k_latent' + str(latent_dim) + '_3blocks_2classes_mixup_flip_normalize_nt'
-proto_file_name = 'protonet_train_20k_val3k_latent' + str(latent_dim) + '_3blocks_2classes_mixup_flip_normalize_nt_df.npy'
+model_name = 'protonet_c23_latent' + str(latent_dim) + '_3blocks_2classes_mixup_flip_normalize_ff'
+proto_file_name = 'protonet_c23_latent' + str(latent_dim) + '_3blocks_2classes_mixup_flip_normalize_ff.npy'
 logger = Logger(model_name='protonet', data_name='ff', log_path=os.path.join(os.getcwd(), 'tf_logs/protonet/2classes/'+model_name))
 model_name = model_name + '.pt'
 best_path = MODEL_PATH + 'protonet/face/2classes/best_mixup/'
@@ -64,7 +64,6 @@ scheduler = ReduceLROnPlateau(optimizer, mode='min', factor=scheduler_factor, pa
 
 
 def train_protonet(epoch):
-
     train_loss = 0
     last_desc = 'Train'
     len_val_loader = len(val_loader_balanced)
@@ -194,7 +193,6 @@ def get_embeddings(custom_loader):
 
 def train_model_protonet():
     best_loss = np.Inf
-    patience = 5
     early_stop = False
     counter = 0
     for epoch in range(1, args.epochs + 1):
@@ -207,8 +205,8 @@ def train_model_protonet():
             print("Best encoder_model saved/updated..")
         else:
             counter += 1
-            print("EarlyStopping counter: " + str(counter) + " out of " + str(patience))
-            if counter >= patience:
+            print("EarlyStopping counter: " + str(counter) + " out of " + str(train_patience))
+            if counter >= train_patience:
                 early_stop = True
         # If early stopping flag is true, then stop the training
         if early_stop:

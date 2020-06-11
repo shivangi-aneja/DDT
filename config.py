@@ -17,7 +17,7 @@ scheduler_factor = 0.7
 scheduler_patience = 5
 divergence = 'wasserstein'
 BASE_PATH = os.getcwd()
-fake_classes = ['nt']
+fake_classes = ['fake']
 num_classes = len(fake_classes) + 1
 orig_weight_factor = num_classes - 1
 ft_images_train = 25
@@ -51,9 +51,9 @@ mse = nn.MSELoss().cuda()
 train_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
 train_path_ff = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
 val_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/val_6k_c23/'
-test_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/test/xtra/'
+test_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/test/'
 
-MODEL_PATH = os.path.join(os.getcwd(), 'pretrained_models/')
+MODEL_PATH = os.path.join(os.getcwd(), 'models/')
 
 
 # Dataloaders fro Pre-training
@@ -84,11 +84,15 @@ test_dataset = make_dataset(name='ff', base_path=test_path, num_classes=num_clas
 
 ### For fine-tuning
 batch_size_train = min(2*ft_images_train, batch_size)
-src_fake_classes = ['df', 'nt']
-target_fake_classes = ['dfdc']
+src_fake_classes = ['fake']
+target_fake_classes = ['fake']
 
+src_train_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
+tgt_train_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/train_20k_c23/'
+val_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/val_6k_c23/'
+test_path = '/home/aneja/Desktop/Data/Masters/master_thesis/data/ff_face_20k/c23/test/'
 
-source_train_dataset = make_dataset(name='ff', base_path=train_path, num_classes=len(src_fake_classes)+1,
+source_train_dataset = make_dataset(name='ff', base_path=src_train_path, num_classes=len(src_fake_classes)+1,
                              mode='face', image_count='all',
                              transform=transforms.Compose([transforms.ToPILImage(),
                                                            transforms.RandomHorizontalFlip(),
@@ -98,7 +102,7 @@ source_train_dataset = make_dataset(name='ff', base_path=train_path, num_classes
                                                            ]))
 
 
-target_train_dataset = make_dataset(name='ff', base_path=train_path, num_classes=len(target_fake_classes) + 1,
+target_train_dataset = make_dataset(name='ff', base_path=tgt_train_path, num_classes=len(target_fake_classes) + 1,
                                     mode='face_finetune', image_count=ft_images_train, base_path_ff=train_path_ff,
                                     transform=transforms.Compose([transforms.ToPILImage(),
                                                                   transforms.RandomHorizontalFlip(),
@@ -107,8 +111,16 @@ target_train_dataset = make_dataset(name='ff', base_path=train_path, num_classes
                                                                   transforms.Normalize([0.5] * 3, [0.5] * 3)]))
 
 
-target_test_dataset = make_dataset(name='ff', base_path=val_path, num_classes=len(target_fake_classes) + 1,
-                                   mode='face_finetune', image_count='all',
+target_val_dataset = make_dataset(name='ff', base_path=val_path, num_classes=len(target_fake_classes)+1,
+                                    mode='face', image_count='all',
+                                   transform=transforms.Compose(
+                                       [transforms.ToPILImage(),
+                                        transforms.ToTensor(),
+                                        transforms.Normalize([0.5] * 3, [0.5] * 3)]))
+
+
+target_test_dataset = make_dataset(name='ff', base_path=test_path, num_classes=len(target_fake_classes) + 1,
+                                   mode='face', image_count='all',
                                    transform=transforms.Compose(
                                        [transforms.ToPILImage(),
                                         transforms.ToTensor(),

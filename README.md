@@ -38,10 +38,10 @@ All the paths (dataset, models) , losses and other hyperparameters are specified
 
 | Method  | File | 
 | ------------- | ------------- |
-| **DDT (Ours)**  | `ddt.py`  |
-| Classifier  | `classifier.py`  |
-| [ProtoNet](https://arxiv.org/pdf/1703.05175.pdf)  | `protonet.py`  |
-| [RelationNet](https://arxiv.org/pdf/1711.06025.pdf)  | `relation_net.py`  |
+| Classifier  | `train_classifier.py`  |
+| [ProtoNet](https://arxiv.org/pdf/1703.05175.pdf)  | `train_protonet.py`  |
+| [RelationNet](https://arxiv.org/pdf/1711.06025.pdf)  | `train_relation_net.py`  |
+| **DDT (Ours)**  | `train_ddt.py`  |
 
 How to run `ddt.py`
 ```
@@ -70,15 +70,21 @@ python3 train_ddt.py --train_mode train
 python3 train_ddt.py --train_mode test
 ```
 
+Pre-trained models for DDT can be downloaded [here](https://drive.google.com/file/d/1Qq8HitP_DQIzz7p679ak3ZFOFO-lmvTN/).
+
 ## 2. Fine-tuning (Few-Shot Learning)
 For fine-tuning experiments, results are compared with supervised domain adaptation methods as well.
 
 | Transfer Learning Method  | File | 
 | ------------- | ------------- |
+| Classifier  | `finetune_classifier.py`  |
 | [DDC (Deep Domain Confusion)](https://arxiv.org/abs/1412.3474)  | `finetune_ddc.py`  |
 | [Deep Correlation Alignment](https://arxiv.org/abs/1607.01719)  | `finetune_coral.py`  |
 | [Classification and Contrastive Semantic Alignment Loss](https://arxiv.org/pdf/1709.10190.pdf)  | `finetune_ccsa.py`  |
-| [d-SNE: Domain Adaptation using Stochastic Neighborhood Embedding](https://arxiv.org/abs/1905.12775)  | `relation_net.py`  |
+| [d-SNE: Domain Adaptation using Stochastic Neighborhood Embedding](https://arxiv.org/abs/1905.12775)  | `finetune_dsne.py`  |
+| [ProtoNet](https://arxiv.org/pdf/1703.05175.pdf)  | `finetune_protonet.py`  |
+| [RelationNet](https://arxiv.org/pdf/1711.06025.pdf)  | `finetune_relation_net.py`  |
+| **DDT (Ours)**  | `finetune_ddt.py`  |
 
 #### Scripts 
 All fine-tuning results are averaged over 10 runs. So we fine-tuned 10 models by running the following scripts.

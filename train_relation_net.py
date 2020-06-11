@@ -236,7 +236,6 @@ def get_embeddings(custom_loader):
 
 def train_model_relation_net():
     best_loss = np.Inf
-    patience = 7
     early_stop = False
     counter = 0
     for epoch in range(1, args.epochs + 1):
@@ -249,8 +248,8 @@ def train_model_relation_net():
             print("Best encoder_model and relation_model saved/updated..")
         else:
             counter += 1
-            print("EarlyStopping counter: " + str(counter) + " out of " + str(patience))
-            if counter >= patience:
+            print("EarlyStopping counter: " + str(counter) + " out of " + str(train_patience))
+            if counter >= train_patience:
                 early_stop = True
         # If early stopping flag is true, then stop the training
         if early_stop:
@@ -260,7 +259,7 @@ def train_model_relation_net():
 
 if __name__ == "__main__":
     if train_mode == 'train':
-        train_model_relation_net()
+        # train_model_relation_net()
         save_prototype_embeddings()
     elif train_mode == 'test':
         test_relationnet_after_training()
